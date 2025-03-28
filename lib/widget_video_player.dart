@@ -18,7 +18,6 @@ class _WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
     super.initState();
     ctVideoPlayer = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
       ..initialize().then((value) {
-        ctVideoPlayer.setLooping(true);
         ctVideoPlayer.play();
         setState(() {});
       });
@@ -38,6 +37,26 @@ class _WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
           child: Stack(
             children: [
               VideoPlayer(key: UniqueKey(), ctVideoPlayer),
+              Positioned.fill(
+                child: Center(
+                  child: GestureDetector(
+                    onTap: togglePlayPause,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.5)),
+                        child: Icon(
+                          ctVideoPlayer.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -48,5 +67,14 @@ class _WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
           ),
         )
         : Center(child: CircularProgressIndicator());
+  }
+
+  void togglePlayPause() {
+    if (ctVideoPlayer.value.isPlaying) {
+      ctVideoPlayer.pause();
+    } else {
+      ctVideoPlayer.play();
+    }
+    setState(() {});
   }
 }
