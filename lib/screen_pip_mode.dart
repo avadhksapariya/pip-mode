@@ -1,6 +1,7 @@
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:pip_mode/screen_local_player.dart';
+import 'package:pip_mode/screen_youtube_player.dart';
 import 'package:pip_mode/widget_video_player.dart';
 
 class ScreenPipMode extends StatefulWidget {
@@ -15,6 +16,7 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
 
   late Floating pip;
   bool isPipAvailable = false;
+  bool showOptions = false;
 
   @override
   void initState() {
@@ -66,11 +68,41 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScreenLocalPlayer()));
-          },
-          child: Icon(Icons.video_library),
+        floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: showOptions,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2.0),
+                    child: FloatingActionButton.small(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScreenLocalPlayer()));
+                      },
+                      child: Icon(Icons.storage),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2.0),
+                    child: FloatingActionButton.small(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => ScreenYoutubePlayer()));
+                      },
+                      child: Icon(Icons.video_library),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                toggleOptions();
+              },
+              child: Icon(showOptions ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
+            ),
+          ],
         ),
       ),
     );
@@ -79,5 +111,11 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
   Future<void> checkPiPAvailability() async {
     isPipAvailable = await pip.isPipAvailable;
     setState(() {});
+  }
+
+  void toggleOptions() {
+    setState(() {
+      showOptions = !showOptions;
+    });
   }
 }

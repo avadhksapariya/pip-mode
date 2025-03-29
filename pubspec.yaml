@@ -37,6 +37,7 @@ dependencies:
   floating: ^6.0.0
   video_player: ^2.9.5
   file_picker: ^9.2.2
+  youtube_player_flutter: ^9.1.1
 
 dev_dependencies:
   flutter_test:
