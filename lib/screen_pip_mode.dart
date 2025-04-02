@@ -17,6 +17,9 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
   late Floating pip;
   bool isPipAvailable = false;
   bool showOptions = false;
+  int lastPosition = 0;
+
+  final GlobalKey<WidgetVideoPlayerState> videoPlayerKey = GlobalKey<WidgetVideoPlayerState>();
 
   @override
   void initState() {
@@ -30,6 +33,9 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.hidden && isPipAvailable && mounted) {
       if (ModalRoute.of(context)!.isCurrent) {
+        setState(() {
+          lastPosition = getCurrentVideoPosition();
+        });
         pip.enable(ImmediatePiP(aspectRatio: Rational.landscape()));
       }
     }
@@ -44,7 +50,7 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
   @override
   Widget build(BuildContext context) {
     return PiPSwitcher(
-      childWhenEnabled: WidgetVideoPlayer(videoUrl: videoUrl),
+      childWhenEnabled: WidgetVideoPlayer(key: videoPlayerKey, videoUrl: videoUrl, startPosition: lastPosition),
       childWhenDisabled: Scaffold(
         appBar: AppBar(title: Text("PiP Mode"), foregroundColor: Colors.white, backgroundColor: Colors.purple.shade400),
         body: SafeArea(
@@ -55,10 +61,13 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
               crossAxisAlignment: CrossAxisAlignment.center,
               spacing: 20.0,
               children: [
-                WidgetVideoPlayer(videoUrl: videoUrl),
+                WidgetVideoPlayer(key: videoPlayerKey, videoUrl: videoUrl, startPosition: lastPosition),
                 ElevatedButton(
                   onPressed: () {
                     if (isPipAvailable) {
+                      setState(() {
+                        lastPosition = getCurrentVideoPosition();
+                      });
                       pip.enable(ImmediatePiP(aspectRatio: Rational.landscape()));
                     }
                   },
@@ -117,5 +126,9 @@ class _ScreenPipModeState extends State<ScreenPipMode> with WidgetsBindingObserv
     setState(() {
       showOptions = !showOptions;
     });
+  }
+
+  int getCurrentVideoPosition() {
+    return videoPlayerKey.currentState!.getCurrentPosition();
   }
 }

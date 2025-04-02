@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class WidgetVideoPlayer extends StatefulWidget {
-  const WidgetVideoPlayer({super.key, required this.videoUrl});
+  const WidgetVideoPlayer({super.key, required this.videoUrl, this.startPosition});
 
   final String videoUrl;
+  final int? startPosition;
 
   @override
-  State<WidgetVideoPlayer> createState() => _WidgetVideoPlayerState();
+  State<WidgetVideoPlayer> createState() => WidgetVideoPlayerState();
 }
 
-class _WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
+class WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
   late VideoPlayerController ctVideoPlayer;
   bool onTouch = false;
   Timer? timer;
@@ -22,6 +23,9 @@ class _WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
     super.initState();
     ctVideoPlayer = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
       ..initialize().then((value) {
+        if (widget.startPosition != null) {
+          ctVideoPlayer.seekTo(Duration(milliseconds: widget.startPosition!));
+        }
         ctVideoPlayer.play();
         setState(() {
           onTouch = true;
@@ -110,5 +114,9 @@ class _WidgetVideoPlayerState extends State<WidgetVideoPlayer> {
     });
 
     setTimer();
+  }
+
+  int getCurrentPosition() {
+    return ctVideoPlayer.value.position.inMilliseconds;
   }
 }
